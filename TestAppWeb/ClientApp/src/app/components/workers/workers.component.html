@@ -1,0 +1,38 @@
+<div>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>ФИО</th>
+        <th>Дата добавления</th>
+        <th>Дата обновления</th>
+        <th>Дата принятия на работу</th>
+        <th>Должность</th>
+        <th>Отдел</th>
+        <th>
+          <a routerLink="/workers/create">
+            <i class="fas fa-plus"></i>
+          </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let worker of workers">
+        <td>{{ worker.name }}</td>
+        <td>{{ worker.dateOfCreation | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ worker.dateOfEdit | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ worker.dateOfEmployement | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ worker.post }}</td>
+        <td>{{ worker.department.name }}</td>
+        <td>
+          <button class="btn btn-primary" routerLink="/workers/{{worker.id}}/update">
+            <i class="fas fa-edit"></i>
+          </button>
+
+          <button class="btn btn-primary" (click)="delete(worker.id)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
