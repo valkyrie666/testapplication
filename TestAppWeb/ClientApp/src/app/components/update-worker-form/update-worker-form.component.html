@@ -1,13 +1,30 @@
+<h3 class="text-center">Обновление информации о сотруднике {{ worker.name }}</h3>
+<br />
 <form [formGroup]="form" (ngSubmit)="submit()" style="width: 50%; margin: 20px auto">
   <div class="form-group">
-    <input type="text" formControlName="workerName" value="{{worker.name}}" class="form-control" id="name" placeholder="ФИО" />
+    <input type="text" formControlName="workerName" value="{{ worker.name }}" class="form-control" id="name" placeholder="ФИО" />
   </div>
   <div class="form-group">
-    <input type="text" formControlName="workerPost" value="{{worker.post}}" class="form-control" id="post" placeholder="Должность" />
-  </div>
-  <div class="form-group">
-    <select class="form-control">
+    <select formControlName="workerPost" class="form-control" id="post">
+      <option value="Экономист">Экономист</option>
+      <option value="Программист">Программист</option>
+      <option value="Тестировщик">Тестировщик</option>
+      <option value="Бухгалтер">Бухгалтер</option>
+      <option value="Главный бухгалтер">Главный бухгалтер</option>
+      <option value="Начальник отдела">Начальник отдела</option>
+      <option value="Директор">Директор</option>
     </select>
   </div>
-  <button type="submit" class="btn btn-primary">Создать</button>
+  <div class="form-group">
+    <input type="date" formControlName="workerEmployed" class="form-control" value="{{ worker.dateOfEmployement }}" />
+  </div>
+  <div class="form-group">
+    <select class="form-control" ng-model="selectedDepartment" formControlName="workerDepartment">
+      <option *ngFor="let department of departmentList" value="{{ department.id }}">
+        {{ department.name }}
+      </option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Сохранить</button>
+  <button class="btn btn-danger" routerLink="/workers">Отмена</button>
 </form>

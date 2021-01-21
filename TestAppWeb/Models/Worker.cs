@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestAppWeb.Models
 {
     public class Worker
     {
         public int Id { get; set; }
-        [Required]
+        [AllowNull]
         public int DepartmentId { get; set; }
         [Required]
         public string Name { get; set; }

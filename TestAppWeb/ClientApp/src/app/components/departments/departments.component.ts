@@ -6,6 +6,7 @@ import { Store, select } from '@ngrx/store';
 import { AppState } from '../../ngrx/states/app.state';
 import { departmentListSelector } from '../../ngrx/selectors/department.selector';
 import { GetDepartments, DeleteDepartment } from '../../ngrx/actions/department.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-departments',
@@ -14,27 +15,16 @@ import { GetDepartments, DeleteDepartment } from '../../ngrx/actions/department.
 })
 export class DepartmentsComponent implements OnInit, OnDestroy {
   departments: Department[];
-  departmentsStream$: Observable<Observable<Department[]>>;
 
   getDepartmentsSub: Subscription;
   deleteDepartmentSub: Subscription;
 
-  constructor(private departmentService: DepartmentService, private store: Store<AppState>) {
-    this.departmentsStream$ = store.pipe(select(departmentListSelector));
-  }
+  constructor(private departmentService: DepartmentService, private router: Router) {}
 
   ngOnInit(): void {
-    this.departmentService.getAll().subscribe(data => {
+    this.getDepartmentsSub = this.departmentService.getAll().subscribe(data => {
       this.departments = data;
     });
-
-    //this.store.dispatch(new GetDepartments());
-    //this.getDepartmentsSub = this.departmentsStream$.subscribe(result => {
-    //  this.getDepartmentsSub = result.subscribe(data => {
-    //    this.departments = data;
-    //  })
-    //});
-
   }
 
   ngOnDestroy() {
@@ -48,11 +38,8 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
   }
 
   delete(id: number) {
-    //this.departmentService.get(id).subscribe(data => {
-    //  this.departments.
-    //});
-    this.departmentService.delete(id).subscribe(
-      //this.departments.filter();
-    );
+    this.deleteDepartmentSub = this.departmentService.delete(id).subscribe(() => {
+      this.departments = this.departments.filter(x => x.Id !== id);
+    });
   }
 }

@@ -56,6 +56,10 @@ namespace TestAppWeb.Services
             var department = _context.Departments.FirstOrDefault(x => x.Id.Equals(id));
             if (department != null)
             {
+                var workersRange = _context.Workers.Where(x => x.DepartmentId.Equals(id)).ToList();
+
+                if (workersRange != null) _context.Workers.RemoveRange(workersRange);
+
                 _context.Departments.Remove(department);
                 _context.SaveChanges();
             }

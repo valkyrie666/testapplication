@@ -75,6 +75,7 @@ namespace TestAppWeb.Services
             workerToUpdate.Name = worker.Name;
             workerToUpdate.Post = worker.Post;
             workerToUpdate.DateOfEdit = worker.DateOfEdit;
+            workerToUpdate.DateOfEmployement = worker.DateOfEmployement;
             workerToUpdate.DepartmentId = worker.DepartmentId;
 
             _context.Workers.Update(workerToUpdate);

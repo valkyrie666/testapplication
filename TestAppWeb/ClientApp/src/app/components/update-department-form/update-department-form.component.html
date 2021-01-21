@@ -1,7 +1,9 @@
-<h3>Редактирование информации об отделе {{department.name}}</h3>
+<h3>Обновление информации об отделе {{department.name}}</h3>
+<br />
 <form [formGroup]="form" (ngSubmit)="submit()" style="width: 50%; margin: 20px auto">
   <div class="form-group">
     <input formControlName="departmentName" value="{{department.name}}" class="form-control" id="name" placeholder="Наименование отдела" />
   </div>
   <button type="submit" class="btn btn-primary">Сохранить</button>
+  <button class="btn btn-danger" routerLink="/departments">Отмена</button>
 </form>

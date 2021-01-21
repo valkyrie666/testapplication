@@ -2,12 +2,13 @@ import { AppState } from "../../ngrx/states/app.state";
 import { Store, select } from '@ngrx/store';
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription, Observable } from "rxjs";
-import { FormGroup, FormControl } from "@angular/forms";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { WorkerService } from "../../services/workers.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { selectSelectedWorker } from "../../ngrx/selectors/worker.selector";
-import { Worker } from "../../interface";
+import { Worker, Department } from "../../interface";
 import { GetWorker } from "../../ngrx/actions/worker.actions";
+import { DepartmentService } from "../../services/departments.service";
 
 @Component({
   selector: 'app-worker-form-update',
@@ -17,12 +18,20 @@ import { GetWorker } from "../../ngrx/actions/worker.actions";
 export class UpdateWorkerFormComponent implements OnInit, OnDestroy {
   form: FormGroup;
   public worker: Worker;
-  getSubscription: Subscription;
-  updateSubscription: Subscription;
+  getWorkerSubscription: Subscription;
+  updateWorkerSubscription: Subscription;
+  getDepartmentsSubscription: Subscription;
+
+  departmentList: Department[];
+  selectedDepartment: Department;
 
   workerStream$: Observable<Observable<Worker>>;
 
-  constructor(private service: WorkerService, private route: ActivatedRoute, private router: Router, private store: Store<AppState>) {
+  constructor(private workerService: WorkerService,
+    private departmentService: DepartmentService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private store: Store<AppState>) {
     this.workerStream$ = store.pipe(select(selectSelectedWorker));
   }
 
@@ -30,26 +39,37 @@ export class UpdateWorkerFormComponent implements OnInit, OnDestroy {
     const id = this.route.snapshot.params.id;
     this.store.dispatch(new GetWorker(id));
 
-    this.getSubscription = this.workerStream$.subscribe(result => {
-      this.getSubscription = result.subscribe(r => {
+    this.getWorkerSubscription = this.workerStream$.subscribe(result => {
+      this.getWorkerSubscription = result.subscribe(r => {
         this.worker = r;
       });
     }, error => console.error(error));
 
+    this.getDepartmentsSubscription = this.departmentService.getAll().subscribe(data => {
+      this.departmentList = data;
+    });
 
     this.form = new FormGroup({
-      workerName: new FormControl(''),
-      workerPost: new FormControl('')
+      workerName: new FormControl('', [Validators.required, Validators.minLength(5)]),
+      workerPost: new FormControl('', [Validators.required, Validators.minLength(1)]),
+      workerEmployed: new FormControl(new Date(), Validators.required),
+      workerDepartment: new FormControl(null, [Validators.required, Validators.minLength(1)])
     });
+
+    console.clear();
   }
 
   ngOnDestroy() {
-    if (this.getSubscription) {
-      this.getSubscription.unsubscribe();
+    if (this.getWorkerSubscription) {
+      this.getWorkerSubscription.unsubscribe();
     }
 
-    if (this.updateSubscription) {
-      this.updateSubscription.unsubscribe();
+    if (this.updateWorkerSubscription) {
+      this.updateWorkerSubscription.unsubscribe();
+    }
+
+    if (this.getDepartmentsSubscription) {
+      this.getDepartmentsSubscription.unsubscribe();
     }
   }
   
@@ -60,11 +80,13 @@ export class UpdateWorkerFormComponent implements OnInit, OnDestroy {
       Post: this.form.value.workerPost,
       DateOfCreation: new Date(),
       DateOfEdit: new Date(),
-      DateOfEmployement: new Date(),
-      DepartmentId: 1,
+      DateOfEmployement: new Date(this.form.value.workerEmployed),
+      DepartmentId: Number(this.form.value.workerDepartment),
     };
 
-    this.updateSubscription = this.service.update(worker).subscribe(() => {
+    console.log(worker);
+
+    this.updateWorkerSubscription = this.workerService.update(worker).subscribe(() => {
       this.router.navigate(['workers']);
     });
   }

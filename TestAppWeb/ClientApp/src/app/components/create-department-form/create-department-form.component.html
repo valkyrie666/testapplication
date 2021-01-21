@@ -1,7 +1,9 @@
-<h3>Добавление нового отдела</h3>
+<h3 class="text-center">Добавить новый отдел</h3>
+<br />
 <form [formGroup]="form" (ngSubmit)="submit()" style="width: 50%; margin: 20px auto">
   <div class="form-group">
     <input type="text" formControlName="departmentName" class="form-control" id="name" placeholder="Наименование отдела" />
   </div>
   <button type="submit" class="btn btn-primary">Сохранить</button>
+  <button class="btn btn-danger" routerLink="/departments">Отмена</button>
 </form>

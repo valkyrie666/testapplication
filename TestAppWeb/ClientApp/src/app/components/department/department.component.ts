@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Department } from "../../interface";
 import { DepartmentService } from "../../services/departments.service";
 import { Router, ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'app-department',
@@ -10,15 +11,20 @@ import { Router, ActivatedRoute } from "@angular/router";
 })
 export class DepartmentComponent implements OnInit, OnDestroy {
   department: Department;
+  getDepartmentSubscription: Subscription;
 
   constructor(private service: DepartmentService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     const id = this.route.snapshot.params.id;
-    this.service.get(id).subscribe(data => {
+    this.getDepartmentSubscription = this.service.get(id).subscribe(data => {
       this.department = data;
     });
   }
 
-  ngOnDestroy() { }
+  ngOnDestroy() {
+    if (this.getDepartmentSubscription) {
+      this.getDepartmentSubscription.unsubscribe();
+    }
+  }
 }

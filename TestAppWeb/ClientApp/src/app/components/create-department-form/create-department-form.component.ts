@@ -3,6 +3,7 @@ import { Department } from '../../interface';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { DepartmentService } from '../../services/departments.service';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-department-form-create',
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
 })
 export class CreateDepartmentFormComponent implements OnInit, OnDestroy {
   form: FormGroup;
+  createSubscription: Subscription;
   constructor(private service: DepartmentService, private router: Router) { }
 
   ngOnInit() {
@@ -19,7 +21,11 @@ export class CreateDepartmentFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() { }
+  ngOnDestroy() {
+    if (this.createSubscription) {
+      this.createSubscription.unsubscribe();
+    }
+  }
 
   submit() {
     if (this.form.invalid) {
@@ -35,7 +41,7 @@ export class CreateDepartmentFormComponent implements OnInit, OnDestroy {
 
     console.log(department.Name);
 
-    this.service.create(department).subscribe(() => {
+    this.createSubscription = this.service.create(department).subscribe(() => {
       this.form.reset();
       this.router.navigate(['departments']);
     });

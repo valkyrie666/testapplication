@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WorkerService } from '../../services/workers.service';
 import { Worker, Department } from '../../interface';
 import { DepartmentService } from '../../services/departments.service';
@@ -10,27 +10,38 @@ import { Subscription } from 'rxjs';
   templateUrl: './create-worker-form.component.html',
   styleUrls: ['./create-worker-form.component.css']
 })
-export class CreateWorkerFormComponent implements OnInit {
+export class CreateWorkerFormComponent implements OnInit, OnDestroy {
   form: FormGroup;
-  Departments: Department[];
+  departmentList: Department[];
   selectedDepartment: Department;
 
   departmentSub: Subscription;
+  createWorkerSub: Subscription;
 
   constructor(private workerService: WorkerService, private departmentService: DepartmentService) { }
 
   ngOnInit(): void {
     this.departmentSub = this.departmentService.getAll().subscribe(data => {
-      this.Departments = data;
+      this.departmentList = data;
+      console.log(this.departmentList);
     });
-
-    console.log(this.Departments);
 
     this.form = new FormGroup({
-      workerName: new FormControl(null, Validators.required),
-      workerPost: new FormControl(null, Validators.required),
-      //workerDepartment: new FormControl(null, Validators.required),
+      workerName: new FormControl('', [Validators.required, Validators.minLength(5)]),
+      workerPost: new FormControl('', [Validators.required, Validators.minLength(1)]),
+      workerEmployed: new FormControl(new Date(), Validators.required),
+      workerDepartment: new FormControl(null, [Validators.required, Validators.minLength(1)])
     });
+  }
+
+  ngOnDestroy() {
+    if (this.createWorkerSub) {
+      this.createWorkerSub.unsubscribe();
+    }
+
+    if (this.departmentSub) {
+      this.departmentSub.unsubscribe();
+    }
   }
 
   submit() {
@@ -42,13 +53,15 @@ export class CreateWorkerFormComponent implements OnInit {
       Name: this.form.value.workerName,
       DateOfCreation: new Date(),
       DateOfEdit: new Date(),
-      DateOfEmployement: new Date(),
-      //Department: this.selectedDepartment,
-      DepartmentId: 1,
+      DateOfEmployement: new Date(this.form.value.workerEmployed),
+      DepartmentId: Number(this.form.value.workerDepartment),
       Post: this.form.value.workerPost
     };
 
-    this.workerService.create(worker).subscribe(() => {
+    console.log(this.form.value.workerEmployed);
+    console.log(worker);
+
+    this.createWorkerSub = this.workerService.create(worker).subscribe(() => {
       this.form.reset();
     });
   }
